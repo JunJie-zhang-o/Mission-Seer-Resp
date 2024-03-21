@@ -57,8 +57,8 @@ class Module(BasicModule):
             气缸已经安装在AGV上时,最下方的气管为解锁,最上方的气管为AGV顶升,中间的气管为AGV下降
     """
     AIR_PUMP_TIMEOUT_ERROR = 15                      # 气泵检测报警超时时间
-    PUSH_OUT_TIMEOUT_ERROR = 5                       # 推出检测报警超时时间
-    PUSH_IN_TIMEOUT_ERROR = 5                       # 推出检测报警超时时间
+    PUSH_OUT_TIMEOUT_ERROR = 10                       # 推出检测报警超时时间
+    PUSH_IN_TIMEOUT_ERROR = 10                       # 推出检测报警超时时间
 
     
     def __init__(self, rbk: SimModule, args):
@@ -72,6 +72,7 @@ class Module(BasicModule):
         self.airWorkingStartT = 0
         self.pushOutStartT = 0
         self.pushInStartT = 0
+        self.manualTrigerFlag = False
         logger.error("init")
 
 
@@ -88,8 +89,8 @@ class Module(BasicModule):
     
     def getDO(self, rbk:SimModule):
         do = rbk.Do()
-        pushIn = do["node"][DOutDefine.CYLINDER_PUSH_OUT]["status"]
-        pushOut = do["node"][DOutDefine.CYLINDER_PUSH_IN]["status"]
+        pushIn = do["node"][DOutDefine.CYLINDER_PUSH_IN]["status"]
+        pushOut = do["node"][DOutDefine.CYLINDER_PUSH_OUT]["status"]
         fixedCylinder = do["node"][DOutDefine.FIXED_CYLINDER]["status"]
         homeOkLed = do["node"][DOutDefine.HOME_OK_LED]["status"]
         logger.debug(f"pushIn:{pushIn},pushOut:{pushOut},fixedCylinder:{fixedCylinder},homeOkLed:{homeOkLed}")
@@ -123,6 +124,17 @@ class Module(BasicModule):
                 logger.warning(Warning55900.msg)
                 rbk.setUserWarning(Warning55900.code, Warning55900.msg)
                 return MoveStatus.FINISHED
+
+        
+        if ((not self.manualTrigerFlag) & self.isManualTriger) == True:
+            if pushOut:
+                self.agvStableSys = False
+                logger.warning(f"manualSwitchAgvStableStatus:{self.agvStableSys}")
+            else:
+                self.agvStableSys = True
+                logger.warning(f"manualSwitchAgvStableStatus:{self.agvStableSys}")
+            self.manualTrigerFlag = True
+        
        
         
         if self.agvStableSys is None:
@@ -155,13 +167,13 @@ class Module(BasicModule):
         # 启动支撑
         logger.info("enableStableSys")
         rbk.setDO(DOutDefine.FIXED_CYLINDER, True)
+        rbk.setDO(DOutDefine.HOME_OK_LED, False)
         rbk.setDO(DOutDefine.CYLINDER_PUSH_IN, False)
         rbk.setDO(DOutDefine.CYLINDER_PUSH_OUT, True)
         if self.pushOutStartT == 0: self.pushOutStartT = time.time()
         [manualOrAuto, isForntOk, isBackOk, switch, airWorking] = self.getDI(rbk)
         if (isForntOk & isBackOk) == False:
             rbk.setDO(DOutDefine.FIXED_CYLINDER, False)
-            rbk.setDO(DOutDefine.HOME_OK_LED, True)
             self.status = MoveStatus.FINISHED
             logger.critical("enableStableSys Success")
             self.pushOutStartT = 0
@@ -187,6 +199,7 @@ class Module(BasicModule):
             self.status = MoveStatus.FINISHED
             logger.critical("disenableStableSys Success")
             rbk.setDO(DOutDefine.FIXED_CYLINDER, False)
+            rbk.setDO(DOutDefine.HOME_OK_LED, True)
         else:
             if time.time() - self.pushInStartT >= self.PUSH_IN_TIMEOUT_ERROR:
                 rbk.setUserError(Error53902.code, Error53902.msg)
