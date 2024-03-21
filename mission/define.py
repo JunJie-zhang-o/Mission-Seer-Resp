@@ -30,7 +30,7 @@ logger = logging.getLogger('Mission Seer')
 logger.setLevel(logging.DEBUG)
 if not logger.hasHandlers():
     try:
-        remoteLogger = RemoteTCPServerLogHandler("192.168.2.11")
+        remoteLogger = RemoteTCPServerLogHandler("192.168.192.34")
         logger.addHandler(remoteLogger)
     except Exception as e:
         logger.error(e)
@@ -67,16 +67,16 @@ class DOutDefine(IntEnum):
 # --------------------------------------- AGV < -- > Robot Register Define --------------------------------------
 class TaskWriteRegister(IntEnum)    : 
     # AGV -> Robot
-    RESERVE_0                       = 300
-    RESERVE_1                       = 301
-    RESERVE_2                       = 302
-    RESERVE_3                       = 303
-    SITE_NUM                        = 304               # 站点数据
-    TASK_NUM                        = 305               # 任务数据
-    RESERVE_6                       = 306
-    RESERVE_7                       = 307
-    RESERVE_8                       = 308
-    DATA_OK_SIGN                    = 309               # 数据已经写入完成
+    SITE_NUM                       = 300               # 站点数据
+    TASK_NUM                       = 301               # 任务数据
+    PARAMS_1                       = 302
+    PARAMS_2                       = 303
+    PARAMS_3                       = 304              
+    PARAMS_4                       = 305               
+    PARAMS_5                       = 306
+    PARAMS_6                       = 307
+    PARAMS_7                       = 308
+    WRITE_DATA_OK_SIGN             = 309               # 数据已经写入完成
     
 class TaskWriteCoils(IntEnum)        : 
     INIT                            = 784               # 初始化
@@ -91,14 +91,14 @@ class TaskReadRegister(IntEnum)     :
     # Robot -> AGV
     TASK_STATE                      = 310               # 任务完成状态
     RESERVE_1                       = 311
-    CLEAR_FLAG                      = 312               # 数据已经写入完成
+    RESERVE_2                       = 312               
     RESERVE_3                       = 313
     RESERVE_4                       = 314
     RESERVE_5                       = 315
     RESERVE_6                       = 316
     RESERVE_7                       = 317
     RESERVE_8                       = 318
-    RESERVE_9                       = 319             
+    READ_DATA_FLAG                  = 319               # 数据已经写入完成
     
     
 class TaskReadCoils(IntEnum)         : 
