@@ -79,13 +79,14 @@ class AirPumpTimeOutCheck(BasePeriodRun):
     """
         监测气泵的输入信号,如果气泵持续有输入信号,则报警并输出切断气泵供电
     """
-    AIR_PUMP_TIMEOUT_ERROR = 15                      # 气泵检测报警超时时间
+    AIR_PUMP_TIMEOUT_ERROR = 90                      # 气泵检测报警超时时间
     airWorkingStartT = 0
 
     @classmethod
     def run(cls, rbk:SimModule):
         logger.info("AirPump")
         airWorking = rbk.Di()["node"][DInDefine.AIR_PUMP_IS_WORKING]["status"]
+        airForcePowerOff = rbk.Do()["node"][DOutDefine.AIR_TIMEOUT_OUT]["status"]
         airTimeoutDout = False
         # == 气泵判断 == 
         if airWorking == True and cls.airWorkingStartT == 0:
@@ -97,10 +98,13 @@ class AirPumpTimeOutCheck(BasePeriodRun):
                 rbk.setUserError(Error53900.code, Error53900.msg)
                 logger.error(Error53900.msg)
                 airTimeoutDout = True
+                cls.airWorkingStartT = t                # 每个超时周期内触发一次,防止触发报警清除
         else:
             cls.airWorkingStartT = 0
             if rbk.errorExits(Error53900.code): rbk.clearError(Error53900.code)
-        rbk.setDO(DOutDefine.AIR_TIMEOUT_OUT, airTimeoutDout)
+        if airTimeoutDout:  # 只设置为True
+            rbk.setDO(DOutDefine.AIR_TIMEOUT_OUT, airTimeoutDout)
+
         # == 气泵判断 == 
 
 
