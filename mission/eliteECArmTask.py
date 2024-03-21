@@ -69,10 +69,10 @@ class Module(BasicModule):
             if self.regSite and self.regTask:
                 self.masterForRobot.write_single_register(self.DEFAULT_SLAVE_ID, TaskWriteRegister.SITE_NUM, self.regSite)
                 self.masterForRobot.write_single_register(self.DEFAULT_SLAVE_ID, TaskWriteRegister.TASK_NUM, self.regTask)
-                self.masterForRobot.write_single_register(self.DEFAULT_SLAVE_ID, TaskWriteRegister.DATA_OK_SIGN, 1)
+                self.masterForRobot.write_single_register(self.DEFAULT_SLAVE_ID, TaskWriteRegister.WRITE_DATA_OK_SIGN, 1)
         
         # 读取完成信号,处理任务状态
-        flag = self.masterForRobot.read_holding_registers(self.DEFAULT_SLAVE_ID, TaskReadRegister.CLEAR_FLAG, 1)[0]
+        flag = self.masterForRobot.read_holding_registers(self.DEFAULT_SLAVE_ID, TaskReadRegister.READ_DATA_FLAG, 1)[0]
         if flag:
             taskExecuteState = self.masterForRobot.read_holding_registers(self.DEFAULT_SLAVE_ID, TaskReadRegister.TASK_STATE, 1)[0]
             if taskExecuteState == 1:
