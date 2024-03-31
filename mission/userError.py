@@ -1,17 +1,24 @@
 
 
+UserDefineErrors   = []
+UserDefineWarnings = []
+
 class UserError():
 
     def __init__(self, code:int, msg:str) -> None:
         self.code:int = code
         self.msg:str = msg
-    
+        UserDefineErrors.append(code)
+
 class UserWarning():
 
     def __init__(self, code:int, msg:str) -> None:
         self.code:int = code
         self.msg:str = msg    
+        UserDefineWarnings.append(code)
     
+
+
 Error53900 = UserError(53900, "气泵持续工作中,请检测是否漏气")
 
 
