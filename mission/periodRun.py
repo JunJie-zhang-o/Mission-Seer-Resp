@@ -141,6 +141,16 @@ class Repositioning(BasePeriodRun):
 
 
 
+class CustomErrorWavPlay(BasePeriodRun):
+    """
+        检查是否存在自定义报错和音频,如果存在则播放对应的错误音频
+    """
+
+    @classmethod
+    def run(cls, rbk:SimModule):
+        pass
+
+
 class Module(BasicModule):
     """
         每个运行周期运行,MainLoop
