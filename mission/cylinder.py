@@ -58,7 +58,7 @@ class Module(BasicModule):
     """
     AIR_PUMP_TIMEOUT_ERROR = 15                      # 气泵检测报警超时时间
     PUSH_OUT_TIMEOUT_ERROR = 10                       # 推出检测报警超时时间
-    PUSH_IN_TIMEOUT_ERROR = 10                       # 推出检测报警超时时间
+    PUSH_IN_TIMEOUT_ERROR = 10                       # 推回检测报警超时时间
 
     
     def __init__(self, rbk: SimModule, args):
